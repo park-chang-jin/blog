@@ -14,8 +14,6 @@ mongoose.connect(db, { useNewUrlParser: true, useCreateIndex: true})
 
 app.use(morgan('dev'));
 
-
-
 app.use('/api/post', postRouter);
 app.use('/api/profile', profileRouter);
 app.use('/api/users', usersRouter);
