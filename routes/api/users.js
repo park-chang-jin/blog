@@ -9,6 +9,7 @@ const keys = require('../../config/keys');
 
 const userModel = require('../../models/user');
 const authCheck = passport.authenticate('jwt', { session: false } );
+const validateRegisterInput = require('../../validation/register');
 
 // @route GET api/users/test
 // @desc Tests users route
@@ -30,14 +31,22 @@ router.post('/register', (req, res) => {
     //     email: req.body.email,
     //     password: req.body.password
     // });
+    const { errors, isValid } = validateRegisterInput(req.body);
+
+    // check validation
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
     userModel
     // Database Email confing
         .findOne({ email: req.body.email })
         .then(user => {
             if (user) {
-                return res.status(400).json({
-                    msg: "Email already exists"
-                });
+                // return res.status(400).json({
+                //     msg: "Email already exists"
+                // });
+                errors.email = 'Email already exists';
+                return res.status(400).json(errors);
             } else {
                 // avatar Create
                 const avatar = gravater.url(req.body.email, {
