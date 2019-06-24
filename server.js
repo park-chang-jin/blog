@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
 const postRouter = require('./routes/api/post');
 const profileRouter = require('./routes/api/profile');
@@ -13,6 +14,10 @@ mongoose.connect(db, { useNewUrlParser: true, useCreateIndex: true})
     .catch( err => console.log(err));
 
 app.use(morgan('dev'));
+
+// body-Parser middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.use('/api/post', postRouter);
 app.use('/api/profile', profileRouter);
