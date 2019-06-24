@@ -1,5 +1,5 @@
 const express = require('express');
-const app = express();
+
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -7,6 +7,8 @@ const bodyParser = require('body-parser');
 const postRouter = require('./routes/api/post');
 const profileRouter = require('./routes/api/profile');
 const usersRouter = require('./routes/api/users');
+
+const app = express();
 
 const db = require('./config/keys').mongoURI;
 mongoose.connect(db, { useNewUrlParser: true, useCreateIndex: true})

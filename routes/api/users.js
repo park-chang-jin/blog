@@ -59,7 +59,6 @@ router.post('/register', (req, res) => {
                     });
                 });
                 
-
             }
         })
         .catch(err => {
@@ -67,7 +66,41 @@ router.post('/register', (req, res) => {
         });
 });
 
+// @route POST api/users/login
+// @desc lgoinUser / returning jsonwebtoken
+// @access Public
 
+router.post('/login', (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    userModel
+    // 이메일 유무 체크
+        .findOne({ email })
+        .then(user => {
+            if (!user) {
+                return res.status(400).json({
+                    msg: "User not found!!!"
+                });
+            } else {
+                // 패스워드 체크
+                bcrypt.compare(password, user.password)
+                    .then(isMatch => {
+                        if (isMatch) {
+                            return res.status(200).json({
+                                msg: "success login"
+                            });
+                        } else {
+                            return res.status(400).json({
+                                msg: "password incorrect"
+                            });
+                        }
+                    })
+                    .catch(err => res.json(err));
+            }
+        })
+        .catch(err => res.json(err));
+});
 
 
 module.exports = router;
