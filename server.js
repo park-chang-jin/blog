@@ -1,9 +1,12 @@
 const express = require('express');
 const app = express();
+const morgan = require('morgan');
 
 const postRouter = require('./routes/api/post');
 const profileRouter = require('./routes/api/profile');
 const usersRouter = require('./routes/api/users');
+
+app.use(morgan('dev'));
 
 app.use('/api/post', postRouter);
 app.use('/api/profile', profileRouter);
