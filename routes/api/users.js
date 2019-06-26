@@ -10,6 +10,7 @@ const keys = require('../../config/keys');
 const userModel = require('../../models/user');
 const authCheck = passport.authenticate('jwt', { session: false } );
 const validateRegisterInput = require('../../validation/register');
+const validateLoginInput = require('../../validation/login');
 
 // @route GET api/users/test
 // @desc Tests users route
@@ -88,14 +89,19 @@ router.post('/login', (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
 
+    const { errors, isValid } = validateLoginInput(req.body);
+
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
     userModel
     // 이메일 유무 체크
         .findOne({ email })
         .then(user => {
             if (!user) {
-                return res.status(400).json({
-                    msg: "User not found!!!"
-                });
+                errors.email = 'Email not info';
+                return res.status(400).json(errors);
             } else {
                 // 패스워드 체크
                 bcrypt.compare(password, user.password)
@@ -119,9 +125,8 @@ router.post('/login', (req, res) => {
                                 }
                             );
                         } else {
-                            return res.status(400).json({
-                                msg: "password incorrect"
-                            });
+                            errors.isMatch = 'password incorrect';
+                            return res.status(400).json(errors);
                         }
                     })
                     .catch(err => res.json(err));
