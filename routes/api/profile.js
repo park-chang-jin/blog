@@ -2,9 +2,18 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const authCheck = passport.authenticate('jwt', { session: false } );
+
+// model
 const profileModel = require('../../models/pofile');
 const userModel = require('../../models/user');
+
+
+
+// vaildation
 const validateProfileInput = require('../../validation/profile');
+const validateEducationInput = require('../../validation/education');
+const validateExperienceInput = require('../../validation/experience');
+
 
 // @route GET api/profile/test
 // @desc Tests profile route
@@ -83,9 +92,6 @@ router.get('/userid/:userid', (req, res) => {
 
 });
 
-
-
-
 // @route POST api/profile
 // @desc register & edit userProfile
 // @access private
@@ -157,5 +163,84 @@ router.post('/', authCheck, (req, res) => {
         .catch(err => res.json(err));
 
 });
+
+// @route POST api/profile/education
+// @desc add education to profiile
+// @access Private
+router.post('/education', authCheck, (req, res) => {
+
+    const { errors, isValid } = validateEducationInput(req.body);
+
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
+    profileModel
+        .findOne({ user: req.user.id })
+        .then(profile => {
+            const newEdu = {
+                school: req.body.school,
+                degree: req.body.degree,
+                from: req.body.from,
+                to: req.body.to,
+                fieldofstudy: req.body.fieldofstudy,
+                current: req.body.current,
+                description: req.body.description
+            };
+
+            profile.education.unshift(newEdu);
+            profile
+                .save()
+                .then(profile => {
+                    res.status(200).json(profile);
+                })
+                .catch(err => res.json(err));
+
+        })
+        .catch(err => res.json(err));
+
+
+});
+
+// @route POST api/profile/experience
+// @desc add experience to profile
+// @access Private
+router.post('/experience', authCheck, (req, res) => {
+
+    const { errors, isValid } = validateExperienceInput(req.body);
+
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
+    profileModel
+        .findOne({ user: req.user.id })
+        .then(profile => {
+            const newExp = {
+                title: req.body.title,
+                company: req.body.company,
+                location: req.body.location,
+                from: req.body.from,
+                to: req.body.to,
+                current: req.body.current,
+                description: req.body.description
+            };
+
+            profile.experience.unshift(newExp);
+            profile
+                .save()
+                .then(profile => {
+                    res.status(200).json(profile);
+                })
+                .catch(err => res.json(err));
+            
+                
+
+        })
+        .catch(err => res.json(err));
+
+});
+
+
 
 module.exports = router;
