@@ -39,6 +39,50 @@ router.get('/all', (req, res) => {
 
 });
 
+// @route GET api/profile/handle/:handle
+// @desc get profile by handle
+// @access Public
+router.get('/handle/:handle', (req, res) => {
+
+    const errors = {};
+    const handle = req.params.handle;
+    profileModel
+        .findOne({ handle: handle})
+        .populate('user', ['name', 'avatar'])
+        .then(profile => {
+            if (!profile) {
+                errors.handle = 'There is no profile for this user';
+                return res.status(404).json(errors);
+            } else {
+                res.status(200).json(profile);
+            }
+        })
+        .catch(err => res.json(err));
+});
+
+// @route GET api/profile/userid/:userid
+// @desc get profile by userid
+// @access Public
+router.get('/userid/:userid', (req, res) => {
+    
+    const errors = {};
+    const userid = req.params.userid;
+
+    profileModel
+        .findOne({ user: userid })
+        .populate('user', ['name', 'avatar'])
+        .then(profile => {
+            if (!profile) {
+                errrors.pofile = 'There is no profile for this user';
+                return res.status(404).json(errors);
+            } else {
+                res.status(200).json(profile);
+            }
+        })
+        .catch(err => res.json(err));
+
+});
+
 
 
 
