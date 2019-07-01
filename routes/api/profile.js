@@ -9,12 +9,38 @@ const validateProfileInput = require('../../validation/profile');
 // @route GET api/profile/test
 // @desc Tests profile route
 // @access Public
-
 router.get('/test', (req, res) => {
     res.json({
         msg: "profile Works"
     });
 });
+
+// @route GET api/profile/all
+// @desc get all profiles
+// @access Public
+router.get('/all', (req, res) => {
+
+    const errros = {};
+
+    profileModel
+        .find()
+        .populate('user', ['name', 'avatar'])
+        .then(profiles => {
+            if (!profiles) {
+                errrors.noprofile = 'There are no profiles';
+                return res.status(404).json(errros);
+            } else {
+                res.status(200).json(profiles);
+            }
+        })
+        .catch(err => res.json({
+            profile: 'There are no profile'
+        }));
+
+});
+
+
+
 
 // @route POST api/profile
 // @desc register & edit userProfile
