@@ -8,7 +8,6 @@ const profileModel = require('../../models/pofile');
 const userModel = require('../../models/user');
 
 
-
 // vaildation
 const validateProfileInput = require('../../validation/profile');
 const validateEducationInput = require('../../validation/education');
@@ -236,6 +235,65 @@ router.post('/experience', authCheck, (req, res) => {
             
                 
 
+        })
+        .catch(err => res.json(err));
+
+});
+
+// @route DELETE api/profile/experience/:exp_id
+// @desc delete experience from profile
+// @access Private
+router.delete('/experience/:exp_id', authCheck, (req, res) => {
+
+    profileModel
+        .findOne({ user: req.user.id })
+        .then(profile => {
+            if (!profile) {
+                return res.status(400).json({
+                    msg: 'No experience info'
+                });
+            } else {
+                const remove_index = profile.experience
+                    .map(item => item.id)
+                    .indexOf(req.params.exp_id)
+                profile.experience.splice(remove_index, 1);
+                profile
+                    .save()
+                    .then(profile => {
+                        res.json(profile);
+                    })
+                    .catch(err => res.json(err));
+            }
+            
+        })
+        .catch(err => res.json(err));
+
+});
+
+// @route DELETE api/profile/education/:exp_id
+// @desc delete education from profile
+// @access Private
+router.delete('/education/:edu_id', authCheck, (req, res) => {
+    
+    profileModel
+        .findOne({ user: req.user.id })
+        .then(profile => {
+            if (!profile) {
+                return res.status(400).json({
+                    msg: 'No education info'
+                });
+            } else {
+                const remove_index = profile.education
+                    .map(item => item.id)
+                    .indexOf(req.params.edu_id)
+                    profile.education.splice(remove_index, 1);
+                    profile
+                        .save()
+                        .then(profile => {
+                            res.json(profile);
+                        })
+                        .catch(err => res.json(err));
+            }
         })
         .catch(err => res.json(err));
 
