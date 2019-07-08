@@ -26,6 +26,7 @@ router.get('/test', (req, res) => {
 // @desc get all post
 // @access publie
 router.get('/all', (req, res) => {
+   
     postModel
         .find()
         .sort({ date: -1 })
@@ -94,12 +95,78 @@ router.delete('/:post_id', authCheck, (req, res) => {
                     } 
                     post
                         .remove()
-                        .then( () => res.json({ msg: 'Successful post Delete' }) )
+                        .then( () => res.json({ 
+                            msg: 'Successful post Delete' 
+                        }))
                         .catch(err => res.json(err));
                 })
                 .catch(err => res.json(err));
         })
         .catch(err => res.json(err));
+});
+
+// @route POST api/post/like/:post_id
+// @desc like post
+// @access Private
+router.post('/like/:post_id', authCheck, (req, res) => {
+
+    profileModel
+        .findOne({ user: req.user.id })
+        .then(profile => {
+            postModel
+                .findById(req.params.post_id)
+                .then(post => {
+                    if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
+                        return res.status(400).json({
+                            msg: 'User already liked this post'
+                        });
+                    } 
+                    // Add user id to likes array
+                    post.likes.unshift({ user: req.user.id });
+                    post.save().then(post => res.json(post)); 
+                })
+                .catch(err => res.json(err));
+        })
+        .catch(err => res.json(err));
+
+});
+
+// @route DELETE api/post/unlike/:post_id
+// @desc like post delete
+// @access Private
+router.post('/unlike/:post_id', authCheck, (req, res) => {
+
+    profileModel
+        .findOne({ user: req.user.id })
+        .then(profile => {
+            postModel
+                .findById(req.params.post_id)
+                .then(post => {
+                    if (post.likes.filter(like => like.user.toString() === req.user.id).length === 0 ) {
+                        return res.status(400).json({
+                            msg: 'No like'
+                        });
+                    }
+                    // get remove index
+                    const remove_index = post.likes
+                        .map(item => item.user.toString())
+                        .indexOf(req.user.id)
+
+                    // splicee out of arrary 
+                    post.likes.splice(remove_index, 1);
+                    // save
+                    post
+                        .save()
+                        .then(post => {
+                            res.json(post);
+                        })
+                    
+                })
+                .catch(err => res.json(err));
+                
+        })
+        .catch(err => res.json(err));
+
 });
 
 module.exports = router;
