@@ -169,4 +169,65 @@ router.post('/unlike/:post_id', authCheck, (req, res) => {
 
 });
 
+// @route POST api/post/comment/:post_id
+// @desc add comment to post
+// @access Private
+router.post('/comment/:post_id', authCheck, (req, res) => {
+
+    const { errors, isValid } = validatePostInput(req.body);
+
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
+    postModel
+        .findById(req.params.post_id)
+        .then(post => {
+            const newComment = {
+                text: req.body.text,
+                name: req.body.name,
+                avater: req.body.avatar,
+                user: req.user.id
+            };
+
+            post.comments.unshift(newComment);
+            post
+                .save()
+                .then(post => {
+                    res.json(post);
+                });
+        })
+        .catch(err => res.json(err));
+
+
+});
+
+// @route DELETE api/post/comment/:post_id/:comment_id
+// @desc comment delete
+// @access Private
+router.delete('/comment/:post_id/:comment_id', authCheck, (req, res) => {
+
+    postModel
+        .findById(req.params.post_id)
+        .then(post => {
+            if (post.comments.filter(comment => comment._id.toString() !== req.params.comment_id).length === 0) {
+                return res.status(400).json({
+                    msg: 'No comment info'
+                });
+            }
+            // get remove index
+            const remove_index = post.comments
+                .map(item => item._id.toString())
+                .indexOf(req.params.comment_id)
+
+            post.comments.splice(remove_index, 1);    
+            post
+                .save()
+                .then(post => {
+                    res.json(post);
+                });
+        })
+        .catch(err => res.json(err));
+});
+
 module.exports = router;

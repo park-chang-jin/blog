@@ -160,7 +160,6 @@ router.post('/', authCheck, (req, res) => {
             }
         })
         .catch(err => res.json(err));
-
 });
 
 // @route POST api/profile/education
@@ -197,8 +196,6 @@ router.post('/education', authCheck, (req, res) => {
 
         })
         .catch(err => res.json(err));
-
-
 });
 
 // @route POST api/profile/experience
@@ -274,7 +271,7 @@ router.delete('/experience/:exp_id', authCheck, (req, res) => {
 // @desc delete education from profile
 // @access Private
 router.delete('/education/:edu_id', authCheck, (req, res) => {
-    
+
     profileModel
         .findOne({ user: req.user.id })
         .then(profile => {
@@ -286,17 +283,17 @@ router.delete('/education/:edu_id', authCheck, (req, res) => {
                 const remove_index = profile.education
                     .map(item => item.id)
                     .indexOf(req.params.edu_id)
-                    profile.education.splice(remove_index, 1);
-                    profile
-                        .save()
-                        .then(profile => {
-                            res.json(profile);
-                        })
-                        .catch(err => res.json(err));
+
+                profile.education.splice(remove_index, 1);
+                profile
+                    .save()
+                    .then(profile => {
+                        res.json(profile);
+                    })
+                    .catch(err => res.json(err));
             }
         })
         .catch(err => res.json(err));
-
 });
 
 
